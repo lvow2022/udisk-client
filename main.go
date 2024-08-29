@@ -1,32 +1,31 @@
 package main
 
 import (
-	"fmt"
 	udisk "udisk-client/udisk-sdk-go/services/udisk/v1"
+	"udisk-client/udisk-sdk-go/test"
 )
 
 func main() {
-	testValidateUpload()
+
+	testUpload()
 }
 
-func testValidateUpload() {
+func testUpload() {
 	client, _ := udisk.NewClient()
 	client.SetBaseURL("http://localhost:8080")
 
-	m := &udisk.Metadata{
-		Name:    "example.txt",
-		Size:    1024000000,
-		Type:    "text/plain",
-		OwnerID: "user_12345",
-		MD5:     "d41d8cd98f00b204e9800998ecf8427e",
-		Path:    "/example.txt",
-	}
 	req := client.NewValidateUploadRequest()
-	req.FileMetadata(m)
 
-	err := req.Send()
+	src := "/Users/luowei/Downloads/iTerm2-3_5_3.zip"
+	dst := "/Users/luowei/go/src/udisk/download"
+	req.SetSrc(src) // 本地
+	req.SetDst(dst)
+
+	resp, err := req.Send()
 	if err != nil {
-		fmt.Println("err1", err)
 		return
 	}
+
+	chunkSize := resp.ChunkSize
+	test.Upload(src, dst, chunkSize)
 }
